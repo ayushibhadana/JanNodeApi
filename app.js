@@ -1,13 +1,12 @@
-
-
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 9500;
+const port = process.env.PORT || 9900;
 const mongo = require('mongodb');
 const MongoClient = mongo.MongoClient;
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const mongourl = "mongodb+srv://users:dbusers@cluster0.4vcfg.mongodb.net/ass4?retryWrites=true&w=majority"
+
+const mongourl = 'mongodb+srv://ayushi14:ayu123@cluster0.jcnys.mongodb.net/edudata?retryWrites=true&w=majority';
 let db;
 
 app.use(cors());
@@ -39,10 +38,10 @@ app.get('/city',(req,res) => {
    
 });
 
-//rest per city
+//rest details
 app.get('/rest/:id',(req,res) =>{
   var id = req.params.id
-  db.collection('restaurant').find({_id:id}).toArray((err,result) => {
+  db.collection('rest').find({_id:id}).toArray((err,result) => {
     if(err) throw err;
     res.send(result)
   })
@@ -71,7 +70,7 @@ app.get('/rest',(req,res) => {
     else if(req.query.city){
       condition={city:req.query.city}
     }
-  db.collection('restaurant').find(condition).toArray((err,result)=>{
+  db.collection('rest').find(condition).toArray((err,result)=>{
     if(err) throw err;
     res.send(result)
   }) 
@@ -79,7 +78,7 @@ app.get('/rest',(req,res) => {
 
 //MealType Route
 app.get('/meal',(req,res) => {
-  db.collection('mealType').find().toArray((err,result) => {
+  db.collection('MealType').find().toArray((err,result) => {
     if(err) throw err;
     res.send(result)
   })
@@ -109,14 +108,14 @@ app.get('/orders',(req,res) => {
   })
 })
 
+
 //connection with mongo serer
 MongoClient.connect(mongourl,(err,connection) => {
   if(err) console.log(err);
-  db = connection.db('ass4');
+  db = connection.db('edudata');
 
   app.listen(port,(err) => {
     if(err) throw err;
     console.log(`Server is running on port ${port}`)
   })
-
 })
