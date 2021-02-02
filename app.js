@@ -1,134 +1,51 @@
-/* const express= require("express");
-const app = express();
-const port = 9900
-// process.env.PORT || 9900
-
-//day15
-
-const mongo = require("mongodb");
-const MongoClient = mongo.MongoClient();   //connecting client with server
-const mongourl = "mongodb://localhost:27017";
-let db;    // obj of database we can use everywhere
-
-
-// we have removed var city and var rest in day15
-
-
-//health check for default url at localhost 9900
-// health check tell that the server is wroking fine or not
-app.get('/',(req, res)=>{
-    res.send("Health OK");
-});
-
-//city Route
-app.get('/city',(req, res)=>{
-    db.collection('city').find().toArray((err, result)=>{
-      if (err) throw err;
-      res.send(result);
-    })
-
-});
-
-//Rest route
-app.get('/rest',(req, res)=>{
-    res.send(rest);
-});
-// res.json(rest);........can also be written like this
-
-
-//day 15 
-//connecting our applicationwith mongo server
-MongoClient.connect(mongourl,(err,connection)=>{
-  if(err) console.log(err);
-  //else
-  db=connection.db('edudb');
-  app.listen(port, (err)=>{
-    if(err) throw err;
-    console.log(`Server is running on port ${port}`);
-});
-
-before
-app.listen(port, (err)=>{
-    if(err) throw err;
-    console.log(`Server is running on port ${port}`)
-})
-*/
-
-
 const express = require('express');
-const app = express();                       //to use express method we are writing is as function and creating object
-const port = 9900;
-// process.env.PORT || 9900
-
-//day15
+const app = express();
+const port = process.env.PORT || 9900;
 const mongo = require('mongodb');
-const MongoClient = mongo.MongoClient;            //connecting client with server
-//const mongourl = "mongodb://localhost:27017";
-const mongourl ='mongodb+srv://ayushi14:ayu123@cluster0.jcnys.mongodb.net/edudb?retryWrites=true&w=majority';
-
-let db;                          // obj of database we can use everywhere
-
-//written when apis lecture done day 17
-
+const MongoClient = mongo.MongoClient;
 const bodyParser = require('body-parser');
 const cors = require('cors');
+
+const mongourl = "mongodb+srv://dev:mongo123@cluster0.f8vmc.mongodb.net/edurekinternship?retryWrites=true&w=majority";
+let db;
 
 app.use(cors());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json())
 
-// we have removed var city and var rest in day15
-
-
-//health check for default url at localhost 9900
-// health check tell that the server is wroking fine or not
 //health Check
 app.get('/',(req,res) => {
     res.send("Health Ok");
 });
 
 //city Route
-/*
 app.get('/city',(req,res) => {
-    db.collection('city').find().toArray((err,result) => {
+    let sortcondition = {city_name:1};
+    let limit =100
+    if(req.query.sort && req.query.limit ){
+      sortcondition = {city_name:Number(req.query.sort)};
+      limit =Number(req.query.limit)
+    }
+    else if(req.query.sort){
+      sortcondition = {city_name:Number(req.query.sort)}
+    }else if(req.query.limit){
+      limit =Number(req.query.limit)
+    }
+    db.collection('city').find().sort(sortcondition).limit(limit).toArray((err,result) => {
       if(err) throw err;
       res.send(result);
     })
    
 });
-*/
-//rest per city
+
+//rest details
 app.get('/rest/:id',(req,res) =>{
   var id = req.params.id
- // var abc = req.params.abc
-  db.collection('restaurent').find({city:id}).toArray((err,result) => {
+  db.collection('restaurent').find({_id:id}).toArray((err,result) => {
     if(err) throw err;
     res.send(result)
   })
 })
-// res.json(rest);........can also be written like this
-
-//day17
-
-//city Route...sorting
-app.get('/city',(req,res) => {
-  let sortcondition = {city_name:1}; // ...1 mean acending and -1 means decending
-  let limit =100
-  if(req.query.sort && req.query.limit ){
-    sortcondition = {city_name:Number(req.query.sort)};
-    limit =Number(req.query.limit)
-  }
-  else if(req.query.sort){
-    sortcondition = {city_name:Number(req.query.sort)}
-  }else if(req.query.limit){
-    limit =Number(req.query.limit)
-  }
-  db.collection('city').find().sort(sortcondition).limit(limit).toArray((err,result) => {
-    if(err) throw err;
-    res.send(result);
-  })
- 
-});
 
 //Rest route
 app.get('/rest',(req,res) => {
@@ -159,6 +76,22 @@ app.get('/rest',(req,res) => {
   }) 
 })
 
+//MealType Route
+app.get('/meal',(req,res) => {
+  db.collection('mealtype').find().toArray((err,result) => {
+    if(err) throw err;
+    res.send(result)
+  })
+})
+
+//cuisine route
+app.get('/cuisine',(req,res) => {
+  db.collection('cuisine').find().toArray((err,result) => {
+    if(err) throw err;
+    res.send(result)
+  })
+})
+
 //placeorder
 app.post('/placeorder',(req,res)=>{
   db.collection('orders').insert(req.body,(err,result) => {
@@ -175,31 +108,14 @@ app.get('/orders',(req,res) => {
   })
 })
 
-//MealType Route
-app.get('/meal',(req,res) => {
-  db.collection('mealType').find().toArray((err,result) => {
-    if(err) throw err;
-    res.send(result)
-  })
-})
 
-//cuisine route
-app.get('/cuisine',(req,res) => {
-  db.collection('cuisine').find().toArray((err,result) => {
-    if(err) throw err;
-    res.send(result)
-  })
-})
-
-//day 15 
-//connecting our applicationwith mongo server
+//connection with mongo serer
 MongoClient.connect(mongourl,(err,connection) => {
   if(err) console.log(err);
-  db = connection.db('edudb');
+  db = connection.db('edurekinternship');
 
   app.listen(port,(err) => {
     if(err) throw err;
     console.log(`Server is running on port ${port}`)
   })
-
 })
