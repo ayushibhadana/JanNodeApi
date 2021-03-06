@@ -50,12 +50,12 @@ app.get('/rest/:id',(req,res) =>{
 
 //Rest route
 app.get('/rest',(req,res) => {
-     var condition ={};
-     let sortcondition = {cost:1};
-     if(req.query.mealtype && req.query.sort){
-     condition={"type.mealtype":req.query.mealtype}
-     sortcondition= {cost:Number(req.query.sort)};
-   }
+  var condition ={};
+  let sortcondition = {cost:1};
+  if(req.query.mealtype && req.query.sort){
+    condition={"type.mealtype":req.query.mealtype}
+    sortcondition= {cost:Number(req.query.sort)};
+  }
     //meal +cost
     if(req.query.mealtype && req.query.lcost && req.query.hcost){
       condition={$and:[{"type.mealtype":req.query.mealtype},{cost:{$lt:Number(req.query.hcost),$gt:Number(req.query.lcost)}}]}
@@ -68,11 +68,6 @@ app.get('/rest',(req,res) => {
     else if(req.query.mealtype && req.query.cuisine){
       condition={$and:[{"type.mealtype":req.query.mealtype},{"Cuisine.cuisine":req.query.cuisine}]}
     }
-
-    //meal +cuisine+city
-    else if(req.query.mealtype && req.query.cuisine && req.query.city){
-      condition={$and:[{"type.mealtype":req.query.mealtype},{"Cuisine.cuisine":req.query.cuisine},{city:req.query.city}]}
-    }
    
     //meal
     else if(req.query.mealtype){
@@ -82,11 +77,12 @@ app.get('/rest',(req,res) => {
     else if(req.query.city){
       condition={city:req.query.city}
     }
-  db.collection('rest').find(condition).toArray((err,result)=>{
+  db.collection('rest').find(condition).sort(sortcondition).toArray((err,result)=>{
     if(err) throw err;
     res.send(result)
   }) 
 })
+
 
 //MealType Route
 app.get('/meal',(req,res) => {
